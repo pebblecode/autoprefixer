@@ -32,8 +32,12 @@ module Octopress
     end
 
     def self.prefix(stylesheet)
+      # If the stylesheet ends with .min we don't want to do anything to it
+      if stylesheet.end_with? ".min.css"
+        return
+      end
+      # Get the configuration from the _config.yml
       opts = Jekyll.configuration({})['autoprefixer']
-      print stylesheet
       content = File.open(stylesheet).read
       prefixedContent = AutoprefixerRails.process(content, opts['css'])
       File.write(stylesheet, prefixedContent)
