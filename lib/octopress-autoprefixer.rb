@@ -45,10 +45,15 @@ module Octopress
       content = File.open(stylesheet).read
       prefixedContent = AutoprefixerRails.process(content, opts['css'])
       File.write(stylesheet, prefixedContent)
+      altPath = stylesheet.gsub /.css$/, '.min.css'
       path = stylesheet.sub('_site/', '').gsub /.css$/, '.min.css'
-      if opts['gh']
-        File.write(path, prefixedContent)
-      end
+      # If the file doesn't exist we want to create it
+      job = Process.fork {
+        if opts['gh']
+          File.write(path, prefixedContent) && FileUtils.cp(stylesheet, altPath)
+        end
+      }
+      Process.detach(job)
     end
   end
 end
