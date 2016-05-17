@@ -32,9 +32,14 @@ module Octopress
     end
 
     def self.prefix(stylesheet)
+      opts = Jekyll.configuration({})['autoprefixer']
+      print stylesheet
       content = File.open(stylesheet).read
-      File.open(stylesheet, 'w') do |f|
-        f.write(AutoprefixerRails.process(content))
+      prefixedContent = AutoprefixerRails.process(content, opts['css'])
+      File.write(stylesheet, prefixedContent)
+      path = stylesheet.sub('_site/', '').gsub /.css$/, '.min.css'
+      if opts['gh']
+        File.write(path, prefixedContent)
       end
     end
   end
