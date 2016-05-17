@@ -4,6 +4,11 @@ require 'find'
 
 module Octopress
   module AutoPrefixer
+    class << self
+      attr_accessor :opts
+    end
+
+    self.opts = Jekyll.configuration({})['autoprefixer']
 
     if defined?(Jekyll::Hooks)
       Jekyll::Hooks.register :site, :post_write, priority: :low do |site|
@@ -37,7 +42,6 @@ module Octopress
         return
       end
       # Get the configuration from the _config.yml
-      opts = Jekyll.configuration({})['autoprefixer']
       content = File.open(stylesheet).read
       prefixedContent = AutoprefixerRails.process(content, opts['css'])
       File.write(stylesheet, prefixedContent)
